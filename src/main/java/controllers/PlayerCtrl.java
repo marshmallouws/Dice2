@@ -5,12 +5,14 @@
  */
 package controllers;
 
+import entities.Dice;
 import entities.MeyerRoll;
 import entities.MeyerStatus;
 import entities.MeyerTurn;
 import entities.PlayerData;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import sockets.ServerCon.ClientHandler;
 
 /**
@@ -21,6 +23,7 @@ public class PlayerCtrl {
 
     private final PlayerData data;
     private final ClientHandler client;
+    private static final Dice DICE = Dice.getInstance();
 
     public PlayerCtrl(ClientHandler client) {
         this.data = new PlayerData(client.getNamen());
@@ -32,41 +35,52 @@ public class PlayerCtrl {
     }
 
     public MeyerRoll rollDice() {
-        MeyerRoll m = new MeyerRoll();
+        int roll = DICE.roll();
+        MeyerRoll m = MeyerRoll.findRoll(roll);
         return m;
     }
 
-    public MeyerTurn firstTurn() {
+    public MeyerTurn firstTurn() throws DieMotherfuckerException {
         MeyerRoll roll;
-        int told = 0;
+        MeyerRoll told;
         client.write("Your turn\nPress enter to roll dice.");
         client.getMessage();
 
-        roll = new MeyerRoll();
-        client.write("You rolled: "
-                + roll.getName()
-                + "\nYou have following options: "
+        roll = rollDice();
+        client.write("You rolled: " + roll.getName());
+        
+        String choices = "\nYou have following options: "
                 + "\n\t1. Say the actual dice value"
                 + "\n\t2. Lie!"
-                + "\nWrite the number of your choice:");
-
-        int choice = 0;
-        while (true) {
-            String msg = client.getMessage();
-            try {
-                choice = Integer.parseInt(msg);
-                if (choice >= 1 || choice <= 2) {
-                    break;
-                }
-                client.write("Not a choice! Try again");
-            } catch (NumberFormatException e) {
-                client.write("Not a number! Try again");
-            }
+                + "\nWrite the number of your choice:";
+        
+        int choice = client.getInt(1, 2, choices);
+        
+        switch(choice) {
+            case 1:
+                told = roll;
+                break;
+            case 2:
+                told = lieMotherfucker();
+                break;
+            default:
+                throw new DieMotherfuckerException();
         }
-
-        // TODO: Change told (find in gameplay)
-        return new MeyerTurn(0, roll, data, false);
+        
+        return new MeyerTurn(told, roll, data, false);
     }
+    
+    private MeyerRoll lieMotherfucker(MeyerRoll prevTold) {
+        Map<Integer, MeyerRoll> possibleChoices;
+        if(prevTold == null) {
+            possibleChoices = MeyerRoll.ROLLS;
+            int choice = client.getInt(1, 21, MeyerRoll.mapToString(possibleChoices));
+        } else {
+            
+        }
+    }
+    
+    
 
     private boolean isHigherOrEqual(int roll, int prev) {
         return roll == prev || roll > prev;
@@ -83,7 +97,7 @@ public class PlayerCtrl {
         int choice = client.getInt(1, 2, options);
         switch (choice) {
             case 1:
-                roll = new MeyerRoll();
+                roll = rollDice();
                 client.write("You rolled " + roll.getName());
 
                 if (isHigherOrEqual(roll.getValue(), told.getValue())) {

@@ -5,21 +5,65 @@
  */
 package entities;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
 import java.util.Random;
 
 /**
  *
- * @author Annika
+ * @author 
  */
 public class MeyerRoll {
+    
     private final String name;
     private final int value;
     private final int dice;
+    public static final Map<Integer, MeyerRoll> ROLLS = new HashMap<Integer, MeyerRoll>() {
+        {
+            put(32, new MeyerRoll(32));
+            put(32, new MeyerRoll(32));
+            put(41, new MeyerRoll(41));
+            put(42, new MeyerRoll(42));
+            put(43, new MeyerRoll(43));
+            put(51, new MeyerRoll(51));
+            put(52, new MeyerRoll(52));
+            put(53, new MeyerRoll(53));
+            put(54, new MeyerRoll(54));
+            put(61, new MeyerRoll(61));
+            put(62, new MeyerRoll(62));
+            put(63, new MeyerRoll(63));
+            put(64, new MeyerRoll(64));
+            put(65, new MeyerRoll(65));
+            put(11, new MeyerRoll(11));
+            put(22, new MeyerRoll(22));
+            put(33, new MeyerRoll(33));
+            put(44, new MeyerRoll(44));
+            put(55, new MeyerRoll(55));
+            put(66, new MeyerRoll(66));
+            put(31, new MeyerRoll(31));
+            put(21, new MeyerRoll(21));
+        }
+    };
     
-    public MeyerRoll(int dice) {
+    public static String mapToString(Map<Integer, MeyerRoll> rolls) {
+        StringBuilder res = new StringBuilder();
+        int i = 1;
+        for(Map.Entry<Integer, MeyerRoll> m: rolls.entrySet()) {
+            res.append(String.format("%d: %d, %s\n", i, m.getValue().getDice(), m.getValue().getName()));
+        }
+        return res.toString();
+    }
+    
+    private MeyerRoll(int dice) {
         this.dice = dice;
         name = meyerName(dice);
         value = meyerVal(dice);
+    }
+    
+    public static MeyerRoll findRoll(int diceMotherfucker) {
+        return ROLLS.get(diceMotherfucker);
     }
     
     /*
@@ -47,14 +91,6 @@ public class MeyerRoll {
                 return diceValue;
         }
     }
-//
-//    private int roll(int d1, int d2) {
-//        if (d1 > d2 || d1 == d2) {
-//            return Integer.parseInt(d1 + "" + d2);
-//        } else {
-//            return Integer.parseInt(d2 + "" + d1);
-//        }
-//    }
 
     private String meyerName(int value) {
         switch (value) {
@@ -90,4 +126,6 @@ public class MeyerRoll {
     public int getDice() {
         return dice;
     }
+    
+    
 }

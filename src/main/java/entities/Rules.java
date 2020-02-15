@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Annika
  */
-public class Rules {
+class Rules {
 
     public static final List<MeyerRoll> ROLLS = new ArrayList<MeyerRoll>() {
         {

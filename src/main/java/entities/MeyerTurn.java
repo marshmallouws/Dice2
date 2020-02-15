@@ -10,20 +10,20 @@ package entities;
  * @author Annika
  */
 public class MeyerTurn {
-    private final int toldValue;
+    private final MeyerRoll told;
     private final MeyerRoll roll;
     private final PlayerData player;
     private final boolean detEllerDerover;
     
-    public MeyerTurn(int toldValue, MeyerRoll roll, PlayerData player, boolean detEllerDerover) {
-        this.toldValue = toldValue;
+    public MeyerTurn(MeyerRoll told, MeyerRoll roll, PlayerData player, boolean detEllerDerover) {
+        this.told = told;
         this.roll = roll;
         this.player = player;
         this.detEllerDerover = detEllerDerover;
     }
 
-    public int getToldValue() {
-        return toldValue;
+    public MeyerRoll getTold() {
+        return told;
     }
 
     public MeyerRoll getRoll() {

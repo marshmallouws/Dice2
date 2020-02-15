@@ -6,6 +6,7 @@
 package sockets;
 
 import controllers.PlayerCtrl;
+import entities.MeyerRoll;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -75,11 +76,20 @@ public class ServerCon {
         public void write(String text) {
             out.println(text);
         }
+        
+        public MeyerRoll getLieMotherFunc(int min, int max, String choices) {
+            try {
+                while(true) {
+                    String input = in.readLine();
+                }
+            }
+        }
 
         public int getInt(int min, int max, String choices) {
             int res = 0;
             try {
                 while (true) {
+                    out.println(choices);
                     String input = in.readLine();
                     try {
                         res = Integer.parseInt(input);
