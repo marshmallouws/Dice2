@@ -87,7 +87,7 @@ public class PlayerCtrl {
         List<MeyerRoll> listRolls = MeyerRoll.mapToList(possibleChoices);
         String s = formatLieList(listRolls);
         int choice = client.getInt(1, possibleChoices.size(), s);
-        return listRolls.get(choice + 1);
+        return listRolls.get(choice - 1);
 
     }
 
