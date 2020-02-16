@@ -5,10 +5,11 @@
  */
 package sockets;
 
+import com.google.gson.Gson;
 import java.net.*;
 import java.io.*;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
+import jsonentities.JsonParser;
 
 /**
  *
@@ -20,6 +21,7 @@ public class ClientCon {
     private PrintWriter out;
     private BufferedReader in;
     private static final Scanner SCAN = new Scanner(System.in);
+    private static final Gson GSON = new Gson();
 
     public void startConnection(String ip, int port) throws IOException {
         clientSocket = new Socket(ip, port);
@@ -36,33 +38,54 @@ public class ClientCon {
         out.close();
         clientSocket.close();
     }
-    
-    public void getMessage() throws IOException {
-        System.out.println(in.readLine());
+
+    public boolean getMessage() throws IOException {
+        String inputLine = in.readLine();
+        JsonParser json = GSON.fromJson(inputLine, JsonParser.class);
+        System.out.println(json.getMsg());
+        return json.isToAnswer();
     }
-    
+
     public void playGame() throws IOException {
         // Sending name to server
         getMessage();
         String name = SCAN.nextLine();
         sendMessage(name);
-        
-        String inputLine;
-        while(true) {
-            inputLine = in.readLine();
-            if("!".equals(inputLine)) {
-                break;
-            } 
-            System.out.println(inputLine);
+
+        while (true) {
+            String inputLine = in.readLine();
+            JsonParser json = GSON.fromJson(inputLine, JsonParser.class);
+            System.out.println(json.getMsg());
+
+            if (json.isToAnswer()) {
+                if (json.getMax() != json.getMin()) {
+                    while (true) {
+                        String res = SCAN.nextLine();
+                        try {
+                            int i = Integer.parseInt(res);
+                            if (i > json.getMax() || i < json.getMin()) {
+                                System.out.println("Not a choice. Try again:");
+                            } else {
+                                sendMessage(res);
+                                break;
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Not a number. Try again:");
+                        }
+                    }
+                } else {
+                    sendMessage(SCAN.nextLine());
+                }
+            }
         }
     }
-    
+
     public static void main(String[] args) throws IOException, InterruptedException {
         ClientCon c = new ClientCon();
         c.startConnection("127.0.0.1", 5555);
-        
+
         c.playGame();
-        
+
 //        System.out.println("Write name:");
 //        String name = SCAN.nextLine();
 //        c.sendMessage("Hello, my name is " + name);

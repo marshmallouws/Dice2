@@ -46,7 +46,9 @@ public class Main {
         // Broadcast the names of all players to clients
         s.writeToAll(nameString);
         
-        //GameCtrl g = new GameCtrl();
+        GameCtrl g = new GameCtrl(players);
+        
+        g.play();
         
     }
 }

@@ -14,12 +14,14 @@ public class MeyerTurn {
     private final MeyerRoll roll;
     private final PlayerData player;
     private final boolean detEllerDerover;
+    private final boolean endOfRound;
     
-    public MeyerTurn(MeyerRoll told, MeyerRoll roll, PlayerData player, boolean detEllerDerover) {
+    public MeyerTurn(MeyerRoll told, MeyerRoll roll, PlayerData player, boolean detEllerDerover, boolean endOfRound) {
         this.told = told;
         this.roll = roll;
         this.player = player;
         this.detEllerDerover = detEllerDerover;
+        this.endOfRound = endOfRound;
     }
 
     public MeyerRoll getTold() {
@@ -34,7 +36,11 @@ public class MeyerTurn {
         return player;
     }
     
-    public boolean getDetEllerDerover() {
+    public boolean isDetEllerDerover() {
         return detEllerDerover;
+    }
+    
+    public boolean isEndOfRound() {
+        return endOfRound;
     }
 }

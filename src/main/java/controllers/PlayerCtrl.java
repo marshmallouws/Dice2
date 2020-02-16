@@ -11,6 +11,7 @@ import entities.MeyerStatus;
 import entities.MeyerTurn;
 import entities.PlayerData;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import sockets.ServerCon.ClientHandler;
@@ -43,73 +44,117 @@ public class PlayerCtrl {
     public MeyerTurn firstTurn() throws DieMotherfuckerException {
         MeyerRoll roll;
         MeyerRoll told;
-        client.write("Your turn\nPress enter to roll dice.");
-        client.getMessage();
+        client.write("Your turn\nPress enter to roll dice.", true);
+        String msg = client.getMessage();
+        System.out.println(msg);
 
         roll = rollDice();
-        client.write("You rolled: " + roll.getName());
-        
+        client.write("You rolled: " + roll.getName(), false);
+
         String choices = "\nYou have following options: "
                 + "\n\t1. Say the actual dice value"
                 + "\n\t2. Lie!"
                 + "\nWrite the number of your choice:";
-        
+
         int choice = client.getInt(1, 2, choices);
-        
-        switch(choice) {
+
+        switch (choice) {
             case 1:
                 told = roll;
                 break;
             case 2:
-                told = lieMotherfucker();
+                told = lieMotherfucker(null);
                 break;
             default:
                 throw new DieMotherfuckerException();
         }
-        
-        return new MeyerTurn(told, roll, data, false);
+        return new MeyerTurn(told, roll, data, false, false);
     }
-    
+
     private MeyerRoll lieMotherfucker(MeyerRoll prevTold) {
         Map<Integer, MeyerRoll> possibleChoices;
-        if(prevTold == null) {
+        if (prevTold == null) {
             possibleChoices = MeyerRoll.ROLLS;
-            int choice = client.getInt(1, 21, MeyerRoll.mapToString(possibleChoices));
+            //return client.getLie(1, 21, MeyerRoll.mapToList(possibleChoices));
         } else {
-            
+            possibleChoices = new HashMap<>();
+            MeyerRoll.ROLLS.forEach((k, v) -> {
+                if (v.getValue() >= prevTold.getValue()) {
+                    possibleChoices.put(k, v);
+                }
+            });
         }
-    }
-    
-    
+        List<MeyerRoll> listRolls = MeyerRoll.mapToList(possibleChoices);
+        String s = formatLieList(listRolls);
+        int choice = client.getInt(1, possibleChoices.size(), s);
+        return listRolls.get(choice + 1);
 
-    private boolean isHigherOrEqual(int roll, int prev) {
-        return roll == prev || roll > prev;
     }
 
-    public MeyerTurn followingTurns(MeyerRoll told, boolean detEllerDerover) {
+    private String formatLieList(List<MeyerRoll> rolls) {
+        String format = "\t%d. %s\n";
+        String res = "You have following options\n";
+        int i = 1;
+        for (MeyerRoll roll : rolls) {
+            res += String.format(format, i, roll.getName());
+            i++;
+        }
+        return res;
+    }
+
+    private boolean isHigherOrEqual(int rollValue, int prevValue) {
+        return rollValue == prevValue || rollValue > prevValue;
+    }
+
+    public MeyerTurn followingTurns(MeyerRoll prevtold, boolean detEllerDerover) {
         MeyerRoll roll;
+        MeyerRoll told;
+
         String options = "\n\nYou have following options: \n\t1. Roll \n\t2. Lift dice cup";
+        int choice = 0;
         if (detEllerDerover) {
-            client.write("Your turn. \nPrevious player rolled " + told + " or above" + options);
+            choice = client.getInt(1, 2, ("Your turn. Previous player rolled " + prevtold.getName() + " or above" + options));
         } else {
-            client.write("Your turn. \nPrevious player rolled " + told + options);
+            choice = client.getInt(1, 2, ("Your turn. Previous player rolled " + prevtold.getName() + options));
         }
-        int choice = client.getInt(1, 2, options);
+        System.out.println(choice);
         switch (choice) {
             case 1:
                 roll = rollDice();
-                client.write("You rolled " + roll.getName());
-
-                if (isHigherOrEqual(roll.getValue(), told.getValue())) {
-                    // Options
-                    // Say actual value
-                    // Lie
+                client.write("You rolled " + roll.getName(), false);
+                if (isHigherOrEqual(roll.getValue(), prevtold.getValue())) {
+                    String choices = "\nYou have following options: "
+                            + "\n\t1. Say the actual dice value"
+                            + "\n\t2. Lie!"
+                            + "\nWrite the number of your choice:";
+                    int choice1 = client.getInt(1, 2, choices);
+                    switch (choice1) {
+                        case 1:
+                            // Say actual val
+                            told = roll;
+                            return new MeyerTurn(told, roll, data, false, false);
+                        case 2:
+                            told = lieMotherfucker(prevtold);
+                    }
                 } else {
+                    String choices = "\nYou have following options: "
+                            + "\n\t1. Lie"
+                            + "\n\t2. Roll and pass dice cup";
+                    int choice1 = client.getInt(1, 2, choices);
+                    switch (choice1) {
+                        case 1:
+                            told = lieMotherfucker(prevtold);
+                            return new MeyerTurn(told, roll, data, false, false);
+                        case 2:
+                            roll = rollDice();
+                            told = roll;
+                            return new MeyerTurn(told, roll, data, true, false);
 
-                    // Roll again and pass dicecup
+                    }
                 }
             case 2:
-            // End of round
+                // No value for dice roll as the user lifted cup.
+                return new MeyerTurn(null, null, data, false, true);
         }
         return null;
     }

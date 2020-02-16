@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.json.JSONObject;
 
 /**
  *
@@ -41,17 +42,19 @@ public class ServerCon {
     }
 
     public void writeToAll(String msg) {
-        clients.forEach(c -> c.write(msg));
+        clients.forEach(c -> c.write(msg, false));
+    }
+
+    public void writeToIdlePlayers(String msg) {
+        clients.forEach(c -> {
+            c.write(msg, false);
+        });
     }
 
     public List<String> getNames() {
         List<String> msgs = new ArrayList<>();
         clients.forEach(c -> msgs.add(c.getNamen()));
         return msgs;
-    }
-
-    public void getSpecificPlayerMessage(/*Recieve something to find player*/) {
-
     }
 
     public void stop() throws IOException {
@@ -73,35 +76,73 @@ public class ServerCon {
             this.clientSocket = socket;
         }
 
-        public void write(String text) {
-            out.println(text);
+        public void write(String msg, boolean toAnswer) {
+            JSONObject obj = new JSONObject();
+            obj.put("msg", msg);
+            obj.put("toAnswer", toAnswer);
+            obj.put("max", 0);
+            obj.put("min", 0);
+            out.println(obj);
+            out.flush();
         }
-        
-        public MeyerRoll getLieMotherFunc(int min, int max, String choices) {
+
+        public MeyerRoll getLie(int min, int max, List<MeyerRoll> choices) {
+            JSONObject obj = new JSONObject();
+            int choice = 0;
             try {
-                while(true) {
+                while (true) {
+                    obj.put("msg", "You have following choices. Write index: " + choices.toString());
+                    obj.put("toAnswer", true);
+                    out.println(obj);
                     String input = in.readLine();
+                    try {
+                        choice = Integer.parseInt(input);
+                        if (choice > max || choice < min) {
+                            out.println("Not an acceptable input. Try again");
+                        } else {
+                            break;
+                        }
+                    } catch (NumberFormatException e) {
+
+                    }
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+            return choices.get(choice + 1);
         }
 
         public int getInt(int min, int max, String choices) {
             int res = 0;
             try {
-                while (true) {
-                    out.println(choices);
-                    String input = in.readLine();
-                    try {
-                        res = Integer.parseInt(input);
-                        if (res > max || res < min) {
-                            out.print("Not an acceptable input" + choices);
-                        } else {
-                            break;
-                        }
-                    } catch (NumberFormatException e) {
-                        out.print("Not a number. " + choices);
-                    }
+                JSONObject obj = new JSONObject();
+                obj.put("msg", choices);
+                obj.put("toAnswer", true);
+                obj.put("max", max);
+                obj.put("min", min);
+                out.println(obj);
+                out.flush();
+                String inp = in.readLine();
+
+                try {
+                    res = Integer.parseInt(inp);
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
                 }
+//                while (true) {
+//                    out.println(choices);
+//                    String input = in.readLine();
+//                    try {
+//                        res = Integer.parseInt(input);
+//                        if (res > max || res < min) {
+//                            out.print("Not an acceptable input" + choices);
+//                        } else {
+//                            break;
+//                        }
+//                    } catch (NumberFormatException e) {
+//                        out.println("Not a number. " + choices);
+//                    }
+//                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -110,7 +151,8 @@ public class ServerCon {
 
         public String getMessage() {
             try {
-                return in.readLine();
+                String i = in.readLine();
+                return i;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -118,7 +160,7 @@ public class ServerCon {
         }
 
         public String getClientName() {
-            write("Hello, write your name: ");
+            write("Hello, write your name: ", true);
             return getMessage();
         }
 
@@ -133,18 +175,19 @@ public class ServerCon {
                         new InputStreamReader(clientSocket.getInputStream()));
 
                 name = getClientName();
-                String inputLine = in.readLine();
+                //String inputLine = in.readLine();
 
-                while (true/*(inputLine = in.readLine()) != null*/) {
-                    if (".".equals(inputLine)) {
-                        out.println("bye");
-                        break;
-                    }
-                }
-                in.close();
-
-                out.close();
-                clientSocket.close();
+//                while (true/*(inputLine = in.readLine()) != null*/) {
+//                    
+//                    if (".".equals(inputLine)) {
+//                        out.println("bye");
+//                        break;
+//                    }
+//                }
+//                in.close();
+//
+//                out.close();
+//                clientSocket.close();
             } catch (IOException ex) {
                 Logger.getLogger(ServerCon.class.getName()).log(Level.SEVERE, null, ex);
             }

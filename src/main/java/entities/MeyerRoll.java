@@ -23,7 +23,6 @@ public class MeyerRoll {
     public static final Map<Integer, MeyerRoll> ROLLS = new HashMap<Integer, MeyerRoll>() {
         {
             put(32, new MeyerRoll(32));
-            put(32, new MeyerRoll(32));
             put(41, new MeyerRoll(41));
             put(42, new MeyerRoll(42));
             put(43, new MeyerRoll(43));
@@ -55,6 +54,14 @@ public class MeyerRoll {
         }
         return res.toString();
     }
+    
+    public static List<MeyerRoll> mapToList(Map<Integer, MeyerRoll> rolls) {
+        List<MeyerRoll> res = new ArrayList<>();
+        rolls.forEach((k,v) -> {
+            res.add(v);
+        });
+        return res;
+    } 
     
     private MeyerRoll(int dice) {
         this.dice = dice;
@@ -126,6 +133,4 @@ public class MeyerRoll {
     public int getDice() {
         return dice;
     }
-    
-    
 }
