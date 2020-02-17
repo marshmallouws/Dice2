@@ -33,7 +33,7 @@ public class ServerCon {
 
         // TODO: Find better way to find clients (Kill after given amount of seconds)
         int i = 0;
-        while (i < 2) {
+        while (i < 3) {
             ClientHandler h = new ClientHandler(serverSocket.accept());
             h.start();
             clients.add(h);
@@ -53,7 +53,7 @@ public class ServerCon {
 
     public List<String> getNames() {
         List<String> msgs = new ArrayList<>();
-        clients.forEach(c -> msgs.add(c.getNamen()));
+        clients.forEach(c -> msgs.add(c.getUserName()));
         return msgs;
     }
 
@@ -86,32 +86,6 @@ public class ServerCon {
             out.flush();
         }
 
-        public MeyerRoll getLie(int min, int max, List<MeyerRoll> choices) {
-            JSONObject obj = new JSONObject();
-            int choice = 0;
-            try {
-                while (true) {
-                    obj.put("msg", "You have following choices. Write index: " + choices.toString());
-                    obj.put("toAnswer", true);
-                    out.println(obj);
-                    String input = in.readLine();
-                    try {
-                        choice = Integer.parseInt(input);
-                        if (choice > max || choice < min) {
-                            out.println("Not an acceptable input. Try again");
-                        } else {
-                            break;
-                        }
-                    } catch (NumberFormatException e) {
-
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return choices.get(choice + 1);
-        }
-
         public int getInt(int min, int max, String choices) {
             int res = 0;
             try {
@@ -135,7 +109,7 @@ public class ServerCon {
             return res;
         }
 
-        public String getMessage() {
+        public String getString() {
             try {
                 String i = in.readLine();
                 return i;
@@ -145,12 +119,12 @@ public class ServerCon {
             return "Failed to recieve message";
         }
 
-        public String getClientName() {
+        private String getClientName() {
             write("Hello, write your name: ", true);
-            return getMessage();
+            return getString();
         }
-
-        public String getNamen() {
+        
+        public String getUserName() {
             return name;
         }
 

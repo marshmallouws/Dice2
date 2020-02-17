@@ -27,7 +27,7 @@ public class PlayerCtrl {
     private static final Dice DICE = Dice.getInstance();
 
     public PlayerCtrl(ClientHandler client) {
-        this.data = new PlayerData(client.getNamen());
+        this.data = new PlayerData(client.getUserName());
         this.client = client;
     }
     
@@ -51,7 +51,7 @@ public class PlayerCtrl {
         MeyerRoll roll;
         MeyerRoll told;
         client.write("Your turn\nPress enter to roll dice.", true);
-        String msg = client.getMessage();
+        String msg = client.getString();
         System.out.println(msg);
 
         roll = rollDice();

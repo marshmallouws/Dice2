@@ -40,14 +40,13 @@ public class Main {
         for(ClientHandler c: clients) {
             PlayerCtrl p = new PlayerCtrl(c);
             players.add(p);
-            nameString += "\n\t" + c.getNamen();
+            nameString += "\n\t" + c.getUserName();
         }
         
         // Broadcast the names of all players to clients
         s.writeToAll(nameString);
         
         GameCtrl g = new GameCtrl(players);
-        
         g.play();
         
     }

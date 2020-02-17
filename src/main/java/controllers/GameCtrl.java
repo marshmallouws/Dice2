@@ -18,18 +18,19 @@ import java.util.logging.Logger;
  */
 public class GameCtrl {
 
-    private final List<PlayerCtrl> players;
+    private final List<PlayerCtrl> allPlayers;
+    private List<PlayerCtrl> playersAlive;
     // TODO: Add data to this list after each turn
     private List<MeyerTurn> turns;
     //private final Map<PlayerCtrl, PlayerData> playerMap;
 
     public GameCtrl(List<PlayerCtrl> players) {
-        this.players = players;
+        this.allPlayers = players;
         turns = new ArrayList<>();
     }
 
     public void writeToIdle(PlayerCtrl current, String msg) {
-        for (PlayerCtrl p : players) {
+        for (PlayerCtrl p : allPlayers) {
             if (!p.equals(current)) {
                 p.writeToPlayer(msg);
             }
@@ -77,6 +78,11 @@ public class GameCtrl {
         } else {
             loser.getData().loseLives(1);
         }
+        
+        if(loser.getData().getLives() <= 0) {
+            System.out.println(playersAlive.remove(loser));
+        } 
+        
         // Starting new round with empty list
         turns = new ArrayList<>();
         return loser;
@@ -85,7 +91,7 @@ public class GameCtrl {
     private String formatLifeList() {
         String format = "\t%s %d\n";
         String res = "Status is following\n";
-        for (PlayerCtrl p : players) {
+        for (PlayerCtrl p : allPlayers) {
             res += String.format(format, p.getData().getName(), p.getData().getLives());
         }
         return res;
@@ -93,9 +99,10 @@ public class GameCtrl {
 
     // Game play
     public void play() {
+        playersAlive = allPlayers;
         PlayerCtrl roundStarter = null;
-        while (players.size() > 1) {
-            for (PlayerCtrl p : players) {
+        while (playersAlive.size() > 1) {
+            for (PlayerCtrl p : playersAlive) {
                 if (roundStarter == null || p.equals(roundStarter)) {
                     writeToIdle(p, p.getData().getName() + "'s turn");
                     MeyerTurn current;
@@ -119,6 +126,15 @@ public class GameCtrl {
                     writeToIdle(p, p.getData().getName() + " rolled " + current.getTold().getName());
                 }
             }
+            findWinner();
+        }
+    }
+    
+    private void findWinner() {
+        if(playersAlive.size() == 1) {
+            PlayerCtrl winner = playersAlive.get(0);
+            // writes to all
+            writeToIdle(null, "The winner is " + winner.getData().getName());
         }
     }
 }
