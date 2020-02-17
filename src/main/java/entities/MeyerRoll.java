@@ -20,29 +20,30 @@ public class MeyerRoll {
     private final String name;
     private final int value;
     private final int dice;
-    public static final Map<Integer, MeyerRoll> ROLLS = new HashMap<Integer, MeyerRoll>() {
+    
+    public static final List<MeyerRoll> ROLLS = new ArrayList<MeyerRoll>() {
         {
-            put(32, new MeyerRoll(32));
-            put(41, new MeyerRoll(41));
-            put(42, new MeyerRoll(42));
-            put(43, new MeyerRoll(43));
-            put(51, new MeyerRoll(51));
-            put(52, new MeyerRoll(52));
-            put(53, new MeyerRoll(53));
-            put(54, new MeyerRoll(54));
-            put(61, new MeyerRoll(61));
-            put(62, new MeyerRoll(62));
-            put(63, new MeyerRoll(63));
-            put(64, new MeyerRoll(64));
-            put(65, new MeyerRoll(65));
-            put(11, new MeyerRoll(11));
-            put(22, new MeyerRoll(22));
-            put(33, new MeyerRoll(33));
-            put(44, new MeyerRoll(44));
-            put(55, new MeyerRoll(55));
-            put(66, new MeyerRoll(66));
-            put(31, new MeyerRoll(31));
-            put(21, new MeyerRoll(21));
+            add(new MeyerRoll(32));
+            add(new MeyerRoll(41));
+            add(new MeyerRoll(42));
+            add(new MeyerRoll(43));
+            add(new MeyerRoll(51));
+            add(new MeyerRoll(52));
+            add(new MeyerRoll(53));
+            add(new MeyerRoll(54));
+            add(new MeyerRoll(61));
+            add(new MeyerRoll(62));
+            add(new MeyerRoll(63));
+            add(new MeyerRoll(64));
+            add(new MeyerRoll(65));
+            add(new MeyerRoll(11));
+            add(new MeyerRoll(22));
+            add(new MeyerRoll(33));
+            add(new MeyerRoll(44));
+            add(new MeyerRoll(55));
+            add(new MeyerRoll(66));
+            add(new MeyerRoll(31));
+            add(new MeyerRoll(21));
         }
     };
     
@@ -55,14 +56,6 @@ public class MeyerRoll {
         return res.toString();
     }
     
-    public static List<MeyerRoll> mapToList(Map<Integer, MeyerRoll> rolls) {
-        List<MeyerRoll> res = new ArrayList<>();
-        rolls.forEach((k,v) -> {
-            res.add(v);
-        });
-        return res;
-    } 
-    
     private MeyerRoll(int dice) {
         this.dice = dice;
         name = meyerName(dice);
@@ -70,7 +63,12 @@ public class MeyerRoll {
     }
     
     public static MeyerRoll findRoll(int diceMotherfucker) {
-        return ROLLS.get(diceMotherfucker);
+        for(MeyerRoll roll: ROLLS) {
+            if(roll.getDice() == diceMotherfucker) {
+                return roll;
+            }
+        }
+        return null;
     }
     
     /*

@@ -30,18 +30,24 @@ public class PlayerCtrl {
         this.data = new PlayerData(client.getNamen());
         this.client = client;
     }
-
-    public String getName() {
-        return data.getName();
+    
+    public PlayerData getData() {
+        return data;
+    }
+    
+    public void writeToPlayer(String msg) {
+        client.write(msg, false);
     }
 
     public MeyerRoll rollDice() {
         int roll = DICE.roll();
+        System.out.println(roll);
         MeyerRoll m = MeyerRoll.findRoll(roll);
+        System.out.println(m);
         return m;
     }
 
-    public MeyerTurn firstTurn() throws DieMotherfuckerException {
+    public MeyerTurn firstTurn() {
         MeyerRoll roll;
         MeyerRoll told;
         client.write("Your turn\nPress enter to roll dice.", true);
@@ -63,31 +69,30 @@ public class PlayerCtrl {
                 told = roll;
                 break;
             case 2:
-                told = lieMotherfucker(null);
+                told = lie(null);
                 break;
-            default:
-                throw new DieMotherfuckerException();
+            default: //Dirty hacks
+                told = roll;
+                break;
         }
-        return new MeyerTurn(told, roll, data, false, false);
+        return new MeyerTurn(told, roll, this, false, false);
     }
 
-    private MeyerRoll lieMotherfucker(MeyerRoll prevTold) {
-        Map<Integer, MeyerRoll> possibleChoices;
+    private MeyerRoll lie(MeyerRoll prevTold) {;
+        List<MeyerRoll> possibleChoices;
         if (prevTold == null) {
             possibleChoices = MeyerRoll.ROLLS;
-            //return client.getLie(1, 21, MeyerRoll.mapToList(possibleChoices));
         } else {
-            possibleChoices = new HashMap<>();
-            MeyerRoll.ROLLS.forEach((k, v) -> {
-                if (v.getValue() >= prevTold.getValue()) {
-                    possibleChoices.put(k, v);
+            possibleChoices = new ArrayList<>();
+            MeyerRoll.ROLLS.forEach(roll -> {
+                if(roll.getValue() >= prevTold.getValue()) {
+                    possibleChoices.add(roll);
                 }
             });
         }
-        List<MeyerRoll> listRolls = MeyerRoll.mapToList(possibleChoices);
-        String s = formatLieList(listRolls);
+        String s = formatLieList(possibleChoices);
         int choice = client.getInt(1, possibleChoices.size(), s);
-        return listRolls.get(choice - 1);
+        return possibleChoices.get(choice - 1);
 
     }
 
@@ -121,6 +126,8 @@ public class PlayerCtrl {
         switch (choice) {
             case 1:
                 roll = rollDice();
+                System.out.println(client);
+                System.out.println(roll);
                 client.write("You rolled " + roll.getName(), false);
                 if (isHigherOrEqual(roll.getValue(), prevtold.getValue())) {
                     String choices = "\nYou have following options: "
@@ -132,9 +139,10 @@ public class PlayerCtrl {
                         case 1:
                             // Say actual val
                             told = roll;
-                            return new MeyerTurn(told, roll, data, false, false);
+                            return new MeyerTurn(told, roll, this, false, false);
                         case 2:
-                            told = lieMotherfucker(prevtold);
+                            told = lie(prevtold);
+                            return new MeyerTurn(told, roll, this, false, false);
                     }
                 } else {
                     String choices = "\nYou have following options: "
@@ -143,18 +151,17 @@ public class PlayerCtrl {
                     int choice1 = client.getInt(1, 2, choices);
                     switch (choice1) {
                         case 1:
-                            told = lieMotherfucker(prevtold);
-                            return new MeyerTurn(told, roll, data, false, false);
+                            told = lie(prevtold);
+                            return new MeyerTurn(told, roll, this, false, false);
                         case 2:
+                            told = prevtold;
                             roll = rollDice();
-                            told = roll;
-                            return new MeyerTurn(told, roll, data, true, false);
-
+                            return new MeyerTurn(told, roll, this, true, false);
                     }
                 }
             case 2:
                 // No value for dice roll as the user lifted cup.
-                return new MeyerTurn(null, null, data, false, true);
+                return new MeyerTurn(null, null, this, false, true);
         }
         return null;
     }

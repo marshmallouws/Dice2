@@ -129,20 +129,6 @@ public class ServerCon {
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
-//                while (true) {
-//                    out.println(choices);
-//                    String input = in.readLine();
-//                    try {
-//                        res = Integer.parseInt(input);
-//                        if (res > max || res < min) {
-//                            out.print("Not an acceptable input" + choices);
-//                        } else {
-//                            break;
-//                        }
-//                    } catch (NumberFormatException e) {
-//                        out.println("Not a number. " + choices);
-//                    }
-//                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -175,19 +161,7 @@ public class ServerCon {
                         new InputStreamReader(clientSocket.getInputStream()));
 
                 name = getClientName();
-                //String inputLine = in.readLine();
-
-//                while (true/*(inputLine = in.readLine()) != null*/) {
-//                    
-//                    if (".".equals(inputLine)) {
-//                        out.println("bye");
-//                        break;
-//                    }
-//                }
-//                in.close();
-//
-//                out.close();
-//                clientSocket.close();
+                
             } catch (IOException ex) {
                 Logger.getLogger(ServerCon.class.getName()).log(Level.SEVERE, null, ex);
             }

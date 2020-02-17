@@ -5,6 +5,8 @@
  */
 package entities;
 
+import controllers.PlayerCtrl;
+
 /**
  *
  * @author Annika
@@ -12,11 +14,11 @@ package entities;
 public class MeyerTurn {
     private final MeyerRoll told;
     private final MeyerRoll roll;
-    private final PlayerData player;
+    private final PlayerCtrl player;
     private final boolean detEllerDerover;
     private final boolean endOfRound;
     
-    public MeyerTurn(MeyerRoll told, MeyerRoll roll, PlayerData player, boolean detEllerDerover, boolean endOfRound) {
+    public MeyerTurn(MeyerRoll told, MeyerRoll roll, PlayerCtrl player, boolean detEllerDerover, boolean endOfRound) {
         this.told = told;
         this.roll = roll;
         this.player = player;
@@ -32,7 +34,7 @@ public class MeyerTurn {
         return roll;
     }
 
-    public PlayerData getPlayer() {
+    public PlayerCtrl getPlayer() {
         return player;
     }
     

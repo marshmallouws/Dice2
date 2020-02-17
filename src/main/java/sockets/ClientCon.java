@@ -85,12 +85,6 @@ public class ClientCon {
         c.startConnection("127.0.0.1", 5555);
 
         c.playGame();
-
-//        System.out.println("Write name:");
-//        String name = SCAN.nextLine();
-//        c.sendMessage("Hello, my name is " + name);
-//        c.getMessage();
-//        TimeUnit.SECONDS.sleep(10);
         c.stopConnection();
     }
 }

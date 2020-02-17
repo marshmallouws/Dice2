@@ -31,7 +31,7 @@ public class Dice {
     
     public int roll() {
         d1 = RND.nextInt(6)+1;
-        d2 = RND.nextInt(6)+2;
+        d2 = RND.nextInt(6)+1;
         if (d1 > d2 || d1 == d2) {
             return Integer.parseInt(d1 + "" + d2);
         } else {

@@ -15,6 +15,7 @@ public class PlayerData {
     
     public PlayerData(String name) {
         this.name = name;
+        lives = 6;
     }
     
     public String getName() {
